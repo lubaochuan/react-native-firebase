@@ -1,53 +1,72 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
-import React, { Component } from 'react';
+import React, { Component } from "react"
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+  Navigator,
+} from "react-native"
 
-export default class RN_Firebase extends Component {
+import * as firebase from "firebase"
+
+import Home from "./includes/views/home"
+import Login from "./includes/views/login"
+import Firebase from "./includes/firebase/firebase"
+
+class Initial extends Component {
+  constructor(props) {
+    super(props);
+    Firebase.initialise();
+
+    this.getInitialView();
+
+    this.state = {
+      userLoaded: false,
+      initialView: null
+    };
+  }
+
+  getInitialView=() => {
+    firebase.auth().onAuthStateChanged((user) => {
+      let initialView = user ? "Home" : "Login";
+      this.setState({
+        userLoaded: true,
+        initialView: initialView
+      })
+    });
+  }
+
+  static renderScene(route, navigator) {
+    switch (route.name) {
+      case "Home":
+        return (<Home navigator={navigator} />);
+        break;
+      case "Login":
+        return (<Login navigator={navigator} />);
+        break;
+    }
+  }
+
+  static configureScene(route) {
+    if (route.sceneConfig) {
+      return (route.sceneConfig);
+    } else {
+      return ({
+        ...Navigator.SceneConfigs.HorizontalSwipeJump,
+        gestures: {}
+      });
+    }
+  }
+
   render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
-      </View>
-    );
+    if (this.state.userLoaded) {
+      return (
+        <Navigator
+          initialRoute={{name: this.state.initialView}}
+          renderScene={Initial.renderScene}
+          configureScene={Initial.configureScene}
+        />);
+    } else {
+      return null;
+    }
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
-
-AppRegistry.registerComponent('RN_Firebase', () => RN_Firebase);
+AppRegistry.registerComponent("RN_Firebase", () => Initial);
