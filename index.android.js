@@ -10,7 +10,7 @@ import Home from "./includes/views/home"
 import Login from "./includes/views/login"
 import Firebase from "./includes/firebase/firebase"
 
-class Initial extends Component {
+class App extends Component {
   constructor(props) {
     super(props);
     Firebase.initialise();
@@ -33,7 +33,7 @@ class Initial extends Component {
     });
   }
 
-  static renderScene(route, navigator) {
+  renderScene=(route, navigator) => {
     switch (route.name) {
       case "Home":
         return (<Home navigator={navigator} />);
@@ -44,7 +44,7 @@ class Initial extends Component {
     }
   }
 
-  static configureScene(route) {
+  configureScene=(route) => {
     if (route.sceneConfig) {
       return (route.sceneConfig);
     } else {
@@ -60,8 +60,8 @@ class Initial extends Component {
       return (
         <Navigator
           initialRoute={{name: this.state.initialView}}
-          renderScene={Initial.renderScene}
-          configureScene={Initial.configureScene}
+          renderScene={this.renderScene}
+          configureScene={this.configureScene}
         />);
     } else {
       return null;
@@ -69,4 +69,4 @@ class Initial extends Component {
   }
 }
 
-AppRegistry.registerComponent("RN_Firebase", () => Initial);
+AppRegistry.registerComponent("RN_Firebase", () => App);
